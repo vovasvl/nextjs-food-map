@@ -1,11 +1,11 @@
 import 'leaflet/dist/leaflet.css';
-import { MapSidebar } from "./components/map-sidebar";
-import { Map } from "./components/map";
+import { MapFilterPanel } from "@/components/MapFilterPanel";
+import { Map } from '@/components/Map';
 
 export default function Home() {
   return (
     <div className="flex w-screen h-screen">
-        <MapSidebar />
+        <MapFilterPanel />
         <div className='flex-1 h-full'>
           <Map />
         </div>

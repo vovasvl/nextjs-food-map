@@ -16,19 +16,19 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 
-const formSchema = z.object({
+const filterSchema = z.object({
   companyName: z.string().min(0).max(255),
   restaurantType: z.string().min(0).max(9999),
   isChain: z.boolean()
 })
 
-export function MapSidebar() {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+export function MapFilterPanel() {
+  const form = useForm<z.infer<typeof filterSchema>>({
+    resolver: zodResolver(filterSchema),
     defaultValues: { companyName: "", restaurantType: "", isChain: false },
   })
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  function onSubmit(values: z.infer<typeof filterSchema>) {
     console.log(values)
   }
 

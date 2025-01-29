@@ -1,16 +1,24 @@
 'use client'
-import { fetchRestaurants, Restaurant } from '@/api/mosData';
 import { useRef, useState } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvent } from 'react-leaflet';
 import L from "leaflet";
+import { Restaurant } from '@/types';
+import { fetchRestaurants } from '@/lib/fetchRestaurants';
 
 function SetViewOnClick({ animate, setRestaurants }: { animate: boolean, setRestaurants: (restaurants: Restaurant[]) => void}) {
   const map = useMapEvent('click', async (e) => {
     map.setView(e.latlng, map.getZoom(), {
       animate: animate,
     });
-    const response = await fetchRestaurants({OperatingCompany: 'Хлеб'});
+
+    try{
+    const response = await fetchRestaurants({OperatingCompany: 'Хлеб', TypeObject: 'кафе'});
     setRestaurants(response);
+    } catch(error) {
+      if(error instanceof Error){
+        console.log(error.message);
+      }
+    }
   });
 
   return null;
