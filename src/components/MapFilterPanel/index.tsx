@@ -15,21 +15,37 @@ import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
+import { useMapMarkersContext } from "@/contexts/MapMarkersContext"
+import { fetchRestaurants } from "@/lib/fetchRestaurants"
 
 const filterSchema = z.object({
-  companyName: z.string().min(0).max(255),
-  restaurantType: z.string().min(0).max(9999),
-  isChain: z.boolean()
+  OperatingCompany: z.string().min(0).max(255),
+  TypeObject: z.string().min(0).max(9999),
+  IsNetObject: z.boolean()
 })
 
 export function MapFilterPanel() {
+  const { setMarkedRestaurants } = useMapMarkersContext();
+  
   const form = useForm<z.infer<typeof filterSchema>>({
     resolver: zodResolver(filterSchema),
-    defaultValues: { companyName: "", restaurantType: "", isChain: false },
+    defaultValues: { OperatingCompany: "", TypeObject: "", IsNetObject: false },
   })
 
-  function onSubmit(values: z.infer<typeof filterSchema>) {
+  async function onSubmit(values: z.infer<typeof filterSchema>) {
     console.log(values)
+    try{
+        const response = await fetchRestaurants({
+          OperatingCompany: values.OperatingCompany,
+          TypeObject: values.TypeObject,
+          IsNetObject: values.IsNetObject
+        });
+        setMarkedRestaurants(response);
+        } catch(error) {
+          if(error instanceof Error){
+            console.log(error.message);
+          }
+        }
   }
 
   return (
@@ -45,7 +61,7 @@ export function MapFilterPanel() {
               <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4">
                 <FormField
                   control={form.control}
-                  name="companyName"
+                  name="OperatingCompany"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Название управляющей компании</FormLabel>
@@ -59,7 +75,7 @@ export function MapFilterPanel() {
 
                 <FormField
                   control={form.control}
-                  name="restaurantType"
+                  name="TypeObject"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Вид объекта</FormLabel>
@@ -73,7 +89,7 @@ export function MapFilterPanel() {
 
                 <FormField
                   control={form.control}
-                  name="isChain"
+                  name="IsNetObject"
                   render={({ field }) => (
                     <FormItem className="flex items-center justify-between p-3 border rounded-lg space-y-0">
                       <FormLabel>Является сетевым</FormLabel>

@@ -25,11 +25,17 @@ export async function GET(request: NextRequest) {
     const filters: RestaurantFilters = Object.fromEntries(searchParams.entries());
 
     const filterString = filters ? Object.entries(filters)
-      .filter(([, value]) => value !== undefined)
-      .map(([key, value]) => `Cells/${key} eq '${value}'`)
+      .filter(([, value]) => value !== undefined && value !== '' && value !== 'false')
+      .map(([key, value]) => {
+        if (value === 'true') {
+          return `Cells/${key} eq ${value}`;
+        } else {
+          return `Cells/${key} eq '${value}'`;
+        }
+      })
       .join(' and ')
       : '';
-
+    console.log('check', filterString);
     const response = await api.get<ApiResponse>('', {
       params: {
         $filter: filterString,

@@ -1,11 +1,12 @@
 'use client'
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvent } from 'react-leaflet';
 import L from "leaflet";
-import { Restaurant } from '@/types';
 import { fetchRestaurants } from '@/lib/fetchRestaurants';
+import { useMapMarkersContext } from '@/contexts/MapMarkersContext';
 
-function SetViewOnClick({ animate, setRestaurants }: { animate: boolean, setRestaurants: (restaurants: Restaurant[]) => void}) {
+function SetViewOnClick({ animate }: { animate: boolean }) {
+  const { setMarkedRestaurants } = useMapMarkersContext();
   const map = useMapEvent('click', async (e) => {
     map.setView(e.latlng, map.getZoom(), {
       animate: animate,
@@ -13,7 +14,7 @@ function SetViewOnClick({ animate, setRestaurants }: { animate: boolean, setRest
 
     try{
     const response = await fetchRestaurants({OperatingCompany: 'Хлеб', TypeObject: 'кафе'});
-    setRestaurants(response);
+    setMarkedRestaurants(response);
     } catch(error) {
       if(error instanceof Error){
         console.log(error.message);
@@ -26,7 +27,9 @@ function SetViewOnClick({ animate, setRestaurants }: { animate: boolean, setRest
 
 export function Map() {
   const mapRef = useRef(null);
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  // const [markedRestaurants, setMarkedRestaurants] = useState<Restaurant[]>([]);
+  const { markedRestaurants } = useMapMarkersContext();
+
 
   const icon = new L.Icon({
     iconUrl: 'https://cdn.jsdelivr.net/npm/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -47,7 +50,7 @@ export function Map() {
           />
 
           <ul>
-            {restaurants.map((item) => {
+            {markedRestaurants.map((item) => {
               return (
                 <li key={item.global_id}>
                   <Marker position={[item.geoData.coordinates[1], item.geoData.coordinates[0]]} icon={icon}/>
@@ -55,7 +58,7 @@ export function Map() {
               );
             })}
           </ul>
-          <SetViewOnClick animate={true} setRestaurants={setRestaurants}/>
+          <SetViewOnClick animate={true} />
         </MapContainer>
   );
 }
