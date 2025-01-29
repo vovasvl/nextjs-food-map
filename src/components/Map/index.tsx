@@ -2,24 +2,13 @@
 import { useRef } from 'react';
 import { MapContainer, Marker, TileLayer, useMapEvent } from 'react-leaflet';
 import L from "leaflet";
-import { fetchRestaurants } from '@/lib/fetchRestaurants';
 import { useMapMarkersContext } from '@/contexts/MapMarkersContext';
 
 function SetViewOnClick({ animate }: { animate: boolean }) {
-  const { setMarkedRestaurants } = useMapMarkersContext();
   const map = useMapEvent('click', async (e) => {
     map.setView(e.latlng, map.getZoom(), {
       animate: animate,
     });
-
-    try{
-    const response = await fetchRestaurants({OperatingCompany: 'Хлеб', TypeObject: 'кафе'});
-    setMarkedRestaurants(response);
-    } catch(error) {
-      if(error instanceof Error){
-        console.log(error.message);
-      }
-    }
   });
 
   return null;
@@ -27,7 +16,6 @@ function SetViewOnClick({ animate }: { animate: boolean }) {
 
 export function Map() {
   const mapRef = useRef(null);
-  // const [markedRestaurants, setMarkedRestaurants] = useState<Restaurant[]>([]);
   const { markedRestaurants } = useMapMarkersContext();
 
 

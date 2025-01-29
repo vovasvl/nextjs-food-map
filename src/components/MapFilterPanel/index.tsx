@@ -33,7 +33,6 @@ export function MapFilterPanel() {
   })
 
   async function onSubmit(values: z.infer<typeof filterSchema>) {
-    console.log(values)
     try{
         const response = await fetchRestaurants({
           OperatingCompany: values.OperatingCompany,

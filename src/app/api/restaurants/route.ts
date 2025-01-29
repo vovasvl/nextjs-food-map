@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
       })
       .join(' and ')
       : '';
-    console.log('check', filterString);
+      
     const response = await api.get<ApiResponse>('', {
       params: {
         $filter: filterString,
