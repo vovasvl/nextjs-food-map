@@ -1,10 +1,20 @@
 'use client';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { ClusteredMarkers } from '../ClusteredMarkers';
+import { useFilterPanelContext } from '@/contexts/FilterPanelContext';
 
 export function Map() {
-  const mapRef = useRef(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const { isSidebarOpen } = useFilterPanelContext();
+  
+  useEffect(() => {
+    if (mapRef.current) {
+      setTimeout(() => {
+        mapRef.current!.invalidateSize();
+      }, 200);
+    }
+  }, [isSidebarOpen]);
 
   return (
     <MapContainer style={{ height: '100%', width: '100%' }}
