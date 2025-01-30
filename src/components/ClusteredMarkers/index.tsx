@@ -13,32 +13,28 @@ const markerIcon = new L.DivIcon({
   popupAnchor: [0, -60],
 });
 
-const getClusterColors = (clusterCount: number) => {
-  if (clusterCount < 10) {
-    return { outer: 'rgba(181, 226, 140, 0.6)', inner: 'rgba(110, 204, 57, 0.6)' };
-  } else if (clusterCount < 100) {
-    return { outer: 'rgba(241, 211, 87, 0.6)', inner: 'rgba(240, 194, 12, 0.6)' };
-  } else {
-    return { outer: 'rgba(253, 156, 115, 0.6)', inner: 'rgba(241, 128, 23, 0.6)' };
-  }
-};
-
 const clusterIcon = (clusterCount: number) => {
-  const { outer, inner } = getClusterColors(clusterCount);
-
   return new L.DivIcon({
     className: 'cluster-marker',
     html: `
-            <div style="position: absolute; width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; border-radius: 20px; 
-            background-color: ${outer};">
-                <div style="width: 30px; height: 30px; margin-left: 5px; margin-top: 5px; text-align: center; align-content: center; border-radius: 15px; 
-                background-color: ${inner};">
-                    <span style="line-height: 30px; font: 12px 'Helvetica Neue', Arial, Helvetica, sans-serif;">
-                      ${clusterCount}
-                    </span>
-                </div>
-            </div>
-        `,
+      <div style="
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        margin-left: -20px;
+        margin-top: -20px;
+        border-radius: 50%;
+        background-color: white;
+        border: 2px solid black;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Geist', sans-serif;
+        color: black;
+      ">
+        ${clusterCount}
+      </div>
+    `,
   });
 };
 
