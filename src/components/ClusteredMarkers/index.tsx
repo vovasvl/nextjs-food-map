@@ -3,7 +3,7 @@ import { Marker, Popup, useMap } from 'react-leaflet';
 import L, { LeafletMouseEvent } from 'leaflet';
 import Supercluster, { AnyProps, ClusterFeature, PointFeature } from 'supercluster';
 import { useMapMarkersContext } from '@/contexts/MapMarkersContext';
-import { RestaurantInfoPopover } from '@/components/RestaurantInfoPopover.tsx';
+import { RestaurantInfoPopover } from '@/components/RestaurantInfoPopover';
 
 const markerIcon = new L.DivIcon({
   className: 'marker-icon',
