@@ -95,3 +95,21 @@ body {
   background: none !important;
   border: none !important;
 }
+
+.leaflet-popup-content-wrapper {
+  background: unset !important;
+  color: unset !important;
+  box-shadow: unset !important;
+}
+
+.leaflet-popup-close-button {
+  display: none !important;
+}
+
+.leaflet-popup-tip-container {
+  display: none !important;
+}
+
+.leaflet-popup-content {
+  margin: 13px 40px 13px 40px !important;
+}

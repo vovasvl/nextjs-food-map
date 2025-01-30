@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Marker, useMap } from 'react-leaflet';
-import L from 'leaflet';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Marker, Popup, useMap } from 'react-leaflet';
+import L, { LeafletMouseEvent } from 'leaflet';
 import Supercluster, { AnyProps, ClusterFeature, PointFeature } from 'supercluster';
 import { useMapMarkersContext } from '@/contexts/MapMarkersContext';
+import { RestaurantInfoPopover } from '@/components/RestaurantInfoPopover.tsx';
 
 const markerIcon = new L.DivIcon({
   className: 'marker-icon',
@@ -46,6 +47,9 @@ export function ClusteredMarkers() {
   const { markedRestaurants } = useMapMarkersContext();
   const [clusters, setClusters] = useState<(ClusterFeature<AnyProps> | PointFeature<AnyProps>)[]>([]);
 
+  const [hoveredMarker, setHoveredMarker] = useState<string | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     const options = { radius: 70, maxZoom: 16 };
     const supercluster = new Supercluster(options);
@@ -53,7 +57,7 @@ export function ClusteredMarkers() {
     supercluster.load(markedRestaurants.map(item => ({
       type: 'Feature',
       id: item.global_id,
-      properties: { cluster: false },
+      properties: { cluster: false, restaurantInfo: {...item} },
       geometry: {
         type: 'Point',
         coordinates: [item.geoData.coordinates[0], item.geoData.coordinates[1]],
@@ -90,6 +94,23 @@ export function ClusteredMarkers() {
     });
   };
 
+  const handleMouseOver = useCallback((e: LeafletMouseEvent, markerId: string | null) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    setHoveredMarker(markerId);
+    e.target.openPopup();
+  }, []);
+
+  const handleMouseOut = useCallback((e: LeafletMouseEvent, markerId: string | null) => {
+    timeoutRef.current = setTimeout(() => {
+      if (hoveredMarker === markerId) {
+        setHoveredMarker(null);
+        e.target.closePopup();
+      }
+    }, 150); 
+  }, [hoveredMarker]);
+
   return (
     <>
       {clusters.map(cluster =>
@@ -107,7 +128,17 @@ export function ClusteredMarkers() {
             key={cluster.id}
             position={[cluster.geometry.coordinates[1], cluster.geometry.coordinates[0]]}
             icon={markerIcon}
-          />
+            eventHandlers={{
+              mouseover: (e) => handleMouseOver(e, cluster.id?.toString() || null),
+              mouseout: (e) => handleMouseOut(e, cluster.id?.toString() || null),
+            }}
+          >
+            <Popup autoPan={false} >
+              <RestaurantInfoPopover
+                restaurant={ cluster.properties.restaurantInfo }
+              />
+            </Popup>
+          </Marker>
         )
       )}
     </>

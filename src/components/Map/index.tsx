@@ -17,7 +17,7 @@ export function Map() {
   }, [isSidebarOpen]);
 
   return (
-    <MapContainer style={{ height: '100%', width: '100%' }}
+    <MapContainer style={{ height: '100%', width: '100%', zIndex: '0' }}
       center={[55.75, 37.62]}
       zoom={10}
       scrollWheelZoom={true}
