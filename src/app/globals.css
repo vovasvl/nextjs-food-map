@@ -90,3 +90,8 @@ body {
 .leaflet-control-attribution {
   display: none;
 }
+
+.leaflet-div-icon {
+  background: none !important;
+  border: none !important;
+}
