@@ -2,14 +2,14 @@
 import { createContext, useContext, useState } from 'react';
 
 type FilterPanelContextType = {
-  isSidebarOpen: boolean;
+  isSidebarOpen: boolean | undefined;
   toggleSidebar: (open: boolean) => void;
 };
 
 const FilterPanelContext = createContext<FilterPanelContextType | undefined>(undefined);
 
 export function FilterPanelProvider({ children }: { children: React.ReactNode }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState<boolean | undefined>(undefined);
 
   const toggleSidebar = (open: boolean) => {
     setIsSidebarOpen(open);
