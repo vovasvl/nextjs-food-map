@@ -8,9 +8,9 @@ import { RestaurantInfoPopover } from '@/components/RestaurantInfoPopover';
 const markerIcon = new L.DivIcon({
   className: 'marker-icon',
   html: `<img src="/markerIcon.svg" />`,
-  iconSize: [52, 60],
-  iconAnchor: [26, 60],
-  popupAnchor: [0, -60],
+  iconSize: [34, 38],
+  iconAnchor: [17, 38],
+  popupAnchor: [0, -15],
 });
 
 const clusterIcon = (clusterCount: number) => {
