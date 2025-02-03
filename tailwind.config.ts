@@ -1,4 +1,15 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import type { Config } from "tailwindcss";
+
+const customColors = {
+	"color-background-base": 'hsl(var(--color-background-base))',
+	"color-background-input": 'hsl(var(--color-background-input))',
+	"color-text-primary": 'hsl(var(--color-text-primary))',
+	"color-text-placeholder": 'hsl(var(--color-text-placeholder))',
+	"color-action-primary": 'hsl(var(--color-action-primary))',
+	"color-indicator-info": 'hsl(var(--color-indicator-info))',
+	"color-indicator-active": 'hsl(var(--color-indicator-active))',
+};
 
 export default {
     darkMode: ["class"],
@@ -10,6 +21,7 @@ export default {
   theme: {
   	extend: {
   		colors: {
+			...customColors,
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -65,8 +77,13 @@ export default {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+		fontSize: {
+			'22px': ['1.375rem', '1.8125rem'], 
+		},
   	}
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
+
+// Custom Tailwind CSS classes that are not colors should be added to the twMergeConfig in @/lib/utils.ts

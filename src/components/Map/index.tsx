@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { MapContainer, TileLayer } from 'react-leaflet';
 import { ClusteredMarkers } from '../ClusteredMarkers';
 import { useFilterPanelContext } from '@/contexts/FilterPanelContext';
+import { CustomControls } from '../CustomControls';
 
 export function Map() {
   const mapRef = useRef<L.Map | null>(null);
@@ -20,6 +21,7 @@ export function Map() {
     <MapContainer style={{ height: '100%', width: '100%', zIndex: '0' }}
       center={[55.75, 37.62]}
       zoom={10}
+      zoomControl={false}
       scrollWheelZoom={true}
       ref={mapRef}
     >
@@ -27,6 +29,7 @@ export function Map() {
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       <ClusteredMarkers />
+      <CustomControls mapRef={mapRef} />
     </MapContainer>
   );
 }
