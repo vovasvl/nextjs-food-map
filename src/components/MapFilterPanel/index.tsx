@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
 import { useMapMarkersContext } from "@/contexts/MapMarkersContext"
 import { fetchRestaurants } from "@/lib/fetchRestaurants"
+import { useState } from "react"
+import { LoadingSpinner } from "../ui/loading-spinner"
 
 type filterType = {
   OperatingCompany: string
@@ -32,6 +34,7 @@ const filterSchema = z.object({
 
 export function MapFilterPanel() {
   const { setMarkedRestaurants } = useMapMarkersContext();
+  const [isLoading, setIsLoading] = useState(false);
   
   const form = useForm<z.infer<typeof filterSchema>>({
     resolver: zodResolver(filterSchema),
@@ -59,18 +62,21 @@ export function MapFilterPanel() {
   ];
 
   async function onSubmit(values: z.infer<typeof filterSchema>) {
-    try{
-        const response = await fetchRestaurants({
-          OperatingCompany: values.OperatingCompany,
-          TypeObject: values.TypeObject,
-          IsNetObject: values.IsNetObject
-        });
-        setMarkedRestaurants(response);
-        } catch(error) {
-          if(error instanceof Error){
-            console.log(error.message);
-          }
-        }
+    setIsLoading(true);
+    try {
+      const response = await fetchRestaurants({
+        OperatingCompany: values.OperatingCompany,
+        TypeObject: values.TypeObject,
+        IsNetObject: values.IsNetObject
+      });
+      setMarkedRestaurants(response);
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message);
+      } 
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -119,7 +125,13 @@ export function MapFilterPanel() {
               </SidebarGroupContent>
               <div className="flex justify-center px-4 py-3">
                 <Button type="submit" className="flex-1 h-10 rounded-xl text-sm font-bold bg-color-action-primary hover:bg-color-action-primary/90">
-                  Применить
+                  {
+                    isLoading ? (
+                      <LoadingSpinner className='stroke-color-text-primary' />
+                    ) : (
+                      "Применить"
+                    )
+                  }
                 </Button>
               </div>
             </form>
