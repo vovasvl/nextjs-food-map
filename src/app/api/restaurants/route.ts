@@ -1,8 +1,8 @@
-import axios from 'axios';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import axios, { AxiosError } from 'axios';
 import { Restaurant, RestaurantKeys } from '@/types';
 import { NextRequest } from 'next/server';
 import { RestaurantFilters } from '@/lib/fetchRestaurants';
-import { unstable_cache } from 'next/cache';
 
 const datasetId = 1903;
 const limit = 1000;
@@ -31,14 +31,6 @@ type ApiResponse = {
   Cells: Restaurant;
 }[];
 
-const totalRestaurantCountCache = unstable_cache(
-  async () => {
-    const response = await api.get<number>('/count');
-    return response.data;
-  },
-  ['total-restaurant-count'],
-  { revalidate: 3600 }
-);
 
 export async function GET(request: NextRequest) {
   try {
@@ -57,7 +49,7 @@ export async function GET(request: NextRequest) {
       .join(' and ')
       : '';
 
-    const totalRestaurantCount = await totalRestaurantCountCache();
+    const totalRestaurantCount = (await api.get<number>('/count')).data;
 
     const requests = [];
     let currentOffset = 0;
@@ -90,8 +82,12 @@ export async function GET(request: NextRequest) {
     const restaurants = allData.map((item) => item.Cells);
 
     return Response.json(restaurants);
-  } catch (error) {
+  } catch (error: unknown | AxiosError) {
     console.error(`Ошибка при загрузке результатов поиска ресторанов: ${error}`);
-    return Response.json({ error: error });
+
+    if (axios.isAxiosError(error))  {
+      return Response.json({ error: `Ошибка на стороне сервера при запросе на строронний API: ${error.code}` });
+    }
+    return Response.json({ error: `Ошибка на стороне сервера: ${error}` });
   }
 }
