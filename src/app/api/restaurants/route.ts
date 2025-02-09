@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
       : '';
 
     const totalRestaurantCount = (await api.get<number>('/count')).data;
-    console.log(`count ${totalRestaurantCount}`);
+    console.error(`count ${totalRestaurantCount}`);
 
     const requests = [];
     let currentOffset = 0;
@@ -75,7 +75,7 @@ export async function GET(request: NextRequest) {
               },
             }
           );
-          console.log(`req ${i} done`)
+          console.error(`req ${i} done`)
           return response.data;
         })(i)
       );
