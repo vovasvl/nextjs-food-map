@@ -3,7 +3,8 @@ import axios, { AxiosError } from 'axios';
 import { Restaurant, RestaurantKeys } from '@/types';
 import { NextRequest } from 'next/server';
 import { RestaurantFilters } from '@/lib/fetchRestaurants';
-import https from 'https'
+import http from 'node:http'
+import https from 'node:https'
 
 const datasetId = 1903;
 const limit = 1000;
@@ -25,6 +26,7 @@ const api = axios.create({
     api_key: process.env.API_KEY,
   },
   timeout: 60000, 
+  httpAgent: new http.Agent({ keepAlive: true }),
   httpsAgent: new https.Agent({ keepAlive: true }),
 });
 
