@@ -54,7 +54,8 @@ export async function GET(request: NextRequest) {
       : '';
     
     console.error('count req started');
-    const totalRestaurantCount = (await api.get<number>('/count')).data;
+    // const totalRestaurantCount = (await api.get<number>('/count')).data;
+    const totalRestaurantCount = 21704;
     console.error(`count ${totalRestaurantCount}`);
 
     const requests = [];
