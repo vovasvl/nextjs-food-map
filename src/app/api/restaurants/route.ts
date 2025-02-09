@@ -3,8 +3,7 @@ import axios, { AxiosError } from 'axios';
 import { Restaurant, RestaurantKeys } from '@/types';
 import { NextRequest } from 'next/server';
 import { RestaurantFilters } from '@/lib/fetchRestaurants';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const https = require('https')
+import https from 'https'
 
 const datasetId = 1903;
 const limit = 1000;
@@ -87,7 +86,7 @@ export async function GET(request: NextRequest) {
 
     return Response.json(restaurants);
   } catch (error: unknown | AxiosError) {
-    console.error(`Ошибка при загрузке результатов поиска ресторанов: ${error}`);
+    console.error('Ошибка при загрузке результатов поиска ресторанов:', error);
 
     if (axios.isAxiosError(error))  {
       return Response.json({ error: `Ошибка на стороне сервера при запросе на строронний API: ${error.code}` });
