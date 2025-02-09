@@ -3,8 +3,8 @@ import axios, { AxiosError } from 'axios';
 import { Restaurant, RestaurantKeys } from '@/types';
 import { NextRequest } from 'next/server';
 import { RestaurantFilters } from '@/lib/fetchRestaurants';
-import http from 'node:http'
-import https from 'node:https'
+import http from 'node:http';
+import https from 'node:https';
 
 const datasetId = 1903;
 const limit = 1000;
@@ -25,7 +25,7 @@ const api = axios.create({
   params: {
     api_key: process.env.API_KEY,
   },
-  timeout: 60000, 
+  timeout: 60000,
   httpAgent: new http.Agent({ keepAlive: true }),
   httpsAgent: new https.Agent({ keepAlive: true }),
 });
@@ -35,7 +35,6 @@ type ApiResponse = {
   Number: number;
   Cells: Restaurant;
 }[];
-
 
 export async function GET(request: NextRequest) {
   try {
@@ -54,42 +53,36 @@ export async function GET(request: NextRequest) {
       })
       .join(' and ')
       : '';
-    
+
     console.error('count req started');
     // const totalRestaurantCount = (await api.get<number>('/count')).data;
     const totalRestaurantCount = 21704;
     console.error(`count ${totalRestaurantCount}`);
 
-    const requests = [];
+    const allData: ApiResponse = [];
     let currentOffset = 0;
 
-    let i=1;
+    let i = 1;
     while (currentOffset < totalRestaurantCount) {
-      requests.push(
-        (async (i) => {
-          const response = await api.post<ApiResponse>(
-            '/rows',
-            JSON.stringify(requestedKeys),
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-              params: {
-                $skip: currentOffset,
-                $filter: filterString,
-              },
-            }
-          );
-          console.error(`req ${i} done`)
-          return response.data;
-        })(i)
+      console.error(`Sending request ${i} for offset ${currentOffset}`);
+      const response = await api.post<ApiResponse>(
+        '/rows',
+        JSON.stringify(requestedKeys),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          params: {
+            $skip: currentOffset,
+            $filter: filterString,
+          },
+        }
       );
-      i+=1;
+      console.error(`req ${i} done`);
+      allData.push(...response.data);
+      i += 1;
       currentOffset += limit;
     }
-
-    const result = await Promise.all(requests);
-    const allData = result.flat(1);
 
     const restaurants = allData.map((item) => item.Cells);
 
@@ -97,7 +90,7 @@ export async function GET(request: NextRequest) {
   } catch (error: unknown | AxiosError) {
     console.error('Ошибка при загрузке результатов поиска ресторанов:', error);
 
-    if (axios.isAxiosError(error))  {
+    if (axios.isAxiosError(error)) {
       return Response.json({ error: `Ошибка на стороне сервера при запросе на строронний API: ${error.code}` });
     }
     return Response.json({ error: `Ошибка на стороне сервера: ${error}` });
