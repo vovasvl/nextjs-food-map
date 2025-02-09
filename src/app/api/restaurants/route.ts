@@ -3,6 +3,8 @@ import axios, { AxiosError } from 'axios';
 import { Restaurant, RestaurantKeys } from '@/types';
 import { NextRequest } from 'next/server';
 import { RestaurantFilters } from '@/lib/fetchRestaurants';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const https = require('https')
 
 const datasetId = 1903;
 const limit = 1000;
@@ -23,6 +25,8 @@ const api = axios.create({
   params: {
     api_key: process.env.API_KEY,
   },
+  timeout: 60000, 
+  httpsAgent: new https.Agent({ keepAlive: true }),
 });
 
 type ApiResponse = {
