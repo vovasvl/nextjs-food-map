@@ -37,6 +37,7 @@ type ApiResponse = {
 
 export async function GET(request: NextRequest) {
   try {
+    console.error('GET req started');
     const searchParams = request.nextUrl.searchParams;
     const filters: RestaurantFilters = Object.fromEntries(searchParams.entries());
 
@@ -51,7 +52,8 @@ export async function GET(request: NextRequest) {
       })
       .join(' and ')
       : '';
-
+    
+    console.error('count req started');
     const totalRestaurantCount = (await api.get<number>('/count')).data;
     console.error(`count ${totalRestaurantCount}`);
 
