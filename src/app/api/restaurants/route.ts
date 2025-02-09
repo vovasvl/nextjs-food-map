@@ -53,13 +53,15 @@ export async function GET(request: NextRequest) {
       : '';
 
     const totalRestaurantCount = (await api.get<number>('/count')).data;
+    console.log(`count ${totalRestaurantCount}`);
 
     const requests = [];
     let currentOffset = 0;
 
+    let i=1;
     while (currentOffset < totalRestaurantCount) {
       requests.push(
-        (async () => {
+        (async (i) => {
           const response = await api.post<ApiResponse>(
             '/rows',
             JSON.stringify(requestedKeys),
@@ -73,9 +75,11 @@ export async function GET(request: NextRequest) {
               },
             }
           );
+          console.log(`req ${i} done`)
           return response.data;
-        })()
+        })(i)
       );
+      i+=1;
       currentOffset += limit;
     }
 
