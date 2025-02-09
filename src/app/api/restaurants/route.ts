@@ -25,9 +25,8 @@ const api = axios.create({
   params: {
     api_key: process.env.API_KEY,
   },
-  timeout: 60000,
-  httpAgent: new http.Agent({ keepAlive: true }),
-  httpsAgent: new https.Agent({ keepAlive: true }),
+  httpAgent: new http.Agent({ keepAlive: true, timeout: 60000 }),
+  httpsAgent: new https.Agent({ keepAlive: true, timeout: 60000 }),
 });
 
 type ApiResponse = {
