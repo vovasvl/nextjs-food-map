@@ -1,7 +1,10 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import axios, { AxiosError } from 'axios';
 import { Restaurant, RestaurantKeys } from '@/types';
 import { NextRequest } from 'next/server';
 import { RestaurantFilters } from '@/lib/fetchRestaurants';
-
+import http from 'node:http';
+import https from 'node:https';
 
 const datasetId = 1903;
 const limit = 1000;
@@ -17,8 +20,15 @@ const requestedKeys: RestaurantKeys[] = [
   'geoData'
 ];
 
-const baseURL = `https://apidata.mos.ru/v1/datasets/${datasetId}`;
-const apiKey = process.env.API_KEY;
+const api = axios.create({
+  baseURL: `https://apidata.mos.ru/v1/datasets/${datasetId}`,
+  params: {
+    api_key: process.env.API_KEY,
+  },
+  timeout: 600000,
+  httpAgent: new http.Agent({ keepAlive: true, timeout: 600000 }),
+  httpsAgent: new https.Agent({ keepAlive: true, timeout: 600000 }),
+});
 
 type ApiResponse = {
   global_id: number;
@@ -55,28 +65,21 @@ export async function GET(request: NextRequest) {
     let i = 1;
     while (currentOffset < totalRestaurantCount) {
       console.error(`Sending request ${i} for offset ${currentOffset}`);
-      const url = new URL(`${baseURL}/rows`);
-      url.searchParams.append('api_key', apiKey || '');
-      url.searchParams.append('$skip', currentOffset.toString());
-      if (filterString) {
-        url.searchParams.append('$filter', filterString);
-      }
-
-      const response = await fetch(url.toString(), {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestedKeys),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data: ApiResponse = await response.json();
+      const response = await api.post<ApiResponse>(
+        '/rows',
+        JSON.stringify(requestedKeys),
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          params: {
+            $skip: currentOffset,
+            $filter: filterString,
+          },
+        }
+      );
       console.error(`req ${i} done`);
-      allData.push(...data);
+      allData.push(...response.data);
       i += 1;
       currentOffset += limit;
     }
@@ -84,11 +87,11 @@ export async function GET(request: NextRequest) {
     const restaurants = allData.map((item) => item.Cells);
 
     return Response.json(restaurants);
-  } catch (error: unknown) {
+  } catch (error: unknown | AxiosError) {
     console.error('Ошибка при загрузке результатов поиска ресторанов:', error);
 
-    if (error instanceof Error) {
-      return Response.json({ error: `Ошибка на стороне сервера при запросе на сторонний API: ${error.message}` });
+    if (axios.isAxiosError(error)) {
+      return Response.json({ error: `Ошибка на стороне сервера при запросе на строронний API: ${error.code}` });
     }
     return Response.json({ error: `Ошибка на стороне сервера: ${error}` });
   }
