@@ -91,6 +91,10 @@ export async function GET(request: NextRequest) {
     console.error('Ошибка при загрузке результатов поиска ресторанов:', error);
 
     if (axios.isAxiosError(error)) {
+      console.error('err req', error.request);
+      console.error('err res', error.response);
+      console.error('err json',error.toJSON());
+      
       return Response.json({ error: `Ошибка на стороне сервера при запросе на строронний API: ${error.code}` });
     }
     return Response.json({ error: `Ошибка на стороне сервера: ${error}` });
